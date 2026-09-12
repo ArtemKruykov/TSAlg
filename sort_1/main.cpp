@@ -6,16 +6,24 @@
 
 using namespace std;
 
-
+/// @brief Глобальный счетчик количества операций сравнения.
 long long comparisons = 0;
+
+/// @brief Глобальный счетчик количества операций присваивания.
 long long assignments = 0;
 
+/**
+ * @brief Сбрасывает глобальные счетчики операций перед запуском нового алгоритма.
+ */
 void resetCounters() {
     comparisons = 0;
     assignments = 0;
 }
 
-// 1. Сортировка выбором
+/**
+ * @brief Сортирует массив методом выбора (в лоб) с использованием временной переменной для обмена.
+ * @param arr Ссылка на вектор целых чисел, который нужно отсортировать.
+ */
 void selectionSort(vector<int>& arr) {
     int n = arr.size();
     for (int i = 0; i < n - 1; i++) {
@@ -26,7 +34,7 @@ void selectionSort(vector<int>& arr) {
                 minIndex = j;
             }
         }
-       
+
         if (minIndex != i) {
             int temp = arr[i];
             arr[i] = arr[minIndex];
@@ -36,7 +44,10 @@ void selectionSort(vector<int>& arr) {
     }
 }
 
-// 2. Сортировка вставкам
+/**
+ * @brief Сортирует массив методом вставок, используя сдвиг элементов вправо.
+ * @param arr Ссылка на вектор целых чисел для сортировки.
+ */
 void insertionSort(vector<int>& arr) {
     int n = arr.size();
     for (int i = 1; i < n; i++) {
@@ -60,7 +71,10 @@ void insertionSort(vector<int>& arr) {
     }
 }
 
-// 3. Быстрая сортировка
+/**
+ * @brief Сортирует массив алгоритмом быстрой сортировки (Хоара).
+ * @param arr Ссылка на вектор целых чисел для сортировки.
+ */
 void hoareSortExtraMemory(vector<int>& arr) {
     if (arr.size() <= 1) {
         return;
@@ -72,7 +86,6 @@ void hoareSortExtraMemory(vector<int>& arr) {
     vector<int> left;
     vector<int> right;
     vector<int> equals;
-
 
     for (size_t i = 0; i < arr.size(); i++) {
         comparisons++;
@@ -96,7 +109,6 @@ void hoareSortExtraMemory(vector<int>& arr) {
     hoareSortExtraMemory(left);
     hoareSortExtraMemory(right);
 
-    
     int index = 0;
     for (int x : left) {
         arr[index++] = x;
@@ -112,6 +124,11 @@ void hoareSortExtraMemory(vector<int>& arr) {
     }
 }
 
+/**
+ * @brief Генерирует массив заданного размера, заполненный случайными числами от -100 до 100.
+ * @param size Количество элементов в генерируемом массиве.
+ * @return Вектор (vector<int>), содержащий случайные числа.
+ */
 vector<int> generateRandomArray(int size) {
     vector<int> arr(size);
     for (int i = 0; i < size; i++) {
@@ -119,6 +136,7 @@ vector<int> generateRandomArray(int size) {
     }
     return arr;
 }
+
 
 int main() {
     setlocale(LC_ALL, "RUSSIAN");
@@ -136,8 +154,7 @@ int main() {
     cout << "Сравнений: " << comparisons << endl;
     cout << "Присваиваний: " << assignments << endl;
 
-
-    //  Сортировка Вставками
+    // Сортировка Вставками
     vector<int> arr2 = originalArray;
     resetCounters();
     insertionSort(arr2);
@@ -149,7 +166,7 @@ int main() {
     vector<int> arr3 = originalArray;
     resetCounters();
     hoareSortExtraMemory(arr3);
-    cout << "\n3. Сортировка Хоара (через левый/правый массивы):" << endl;
+    cout << "\n3. Сортировка Хоара:" << endl;
     cout << "Сравнений: " << comparisons << endl;
     cout << "Присваиваний: " << assignments << endl;
 
