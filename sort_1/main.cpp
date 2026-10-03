@@ -6,30 +6,18 @@
 
 using namespace std;
 
-/// @brief Глобальный счетчик количества операций сравнения.
-long long comparisons = 0;
-
-/// @brief Глобальный счетчик количества операций присваивания.
-long long assignments = 0;
-
 /**
- * @brief Сбрасывает глобальные счетчики операций перед запуском нового алгоритма.
+ * @brief Сортирует массив методом выбора с использованием size_t и локальных счетчиков.
+ * @param arr Вектор целых чисел для сортировки.
+ * @param comp Ссылка на счетчик сравнений.
+ * @param assign Ссылка на счетчик присваиваний.
  */
-void resetCounters() {
-    comparisons = 0;
-    assignments = 0;
-}
-
-/**
- * @brief Сортирует массив методом выбора (в лоб) с использованием временной переменной для обмена.
- * @param arr Ссылка на вектор целых чисел, который нужно отсортировать.
- */
-void selectionSort(vector<int>& arr) {
-    int n = arr.size();
-    for (int i = 0; i < n - 1; i++) {
-        int minIndex = i;
-        for (int j = i + 1; j < n; j++) {
-            comparisons++;
+void selectionSort(vector<int>& arr, long long& comp, long long& assign) {
+    size_t n = arr.size();
+    for (size_t i = 0; i < n - 1; ++i) {
+        size_t minIndex = i;
+        for (size_t j = i + 1; j < n; ++j) {
+            comp++;
             if (arr[j] < arr[minIndex]) {
                 minIndex = j;
             }
@@ -39,99 +27,104 @@ void selectionSort(vector<int>& arr) {
             int temp = arr[i];
             arr[i] = arr[minIndex];
             arr[minIndex] = temp;
-            assignments += 3;
+            assign += 3;
         }
     }
 }
 
 /**
- * @brief Сортирует массив методом вставок, используя сдвиг элементов вправо.
- * @param arr Ссылка на вектор целых чисел для сортировки.
+ * @brief Сортирует массив методом вставок, используя std::vector::insert и std::vector::erase.
+ * @param arr Вектор целых чисел для сортировки.
+ * @param comp Ссылка на счетчик сравнений.
+ * @param assign Ссылка на счетчик присваиваний.
  */
-void insertionSort(vector<int>& arr) {
-    int n = arr.size();
-    for (int i = 1; i < n; i++) {
+void insertionSort(vector<int>& arr, long long& comp, long long& assign) {
+    size_t n = arr.size();
+    for (size_t i = 1; i < n; ++i) {
         int key = arr[i];
-        assignments++;
-        int j = i - 1;
+        assign++;
+        size_t j = 0;
 
-        while (j >= 0) {
-            comparisons++;
+        while (j < i) {
+            comp++;
             if (arr[j] > key) {
-                arr[j + 1] = arr[j];
-                assignments++;
-                j--;
-            }
-            else {
                 break;
             }
+            j++;
         }
-        arr[j + 1] = key;
-        assignments++;
+
+        if (j < i) {
+            arr.erase(arr.begin() + i);
+            assign++;
+            arr.insert(arr.begin() + j, key);
+            assign++;
+        }
     }
 }
 
 /**
- * @brief Сортирует массив алгоритмом быстрой сортировки (Хоара).
- * @param arr Ссылка на вектор целых чисел для сортировки.
+ * @brief Сортировка Хоара.
+ * @param arr Вектор целых чисел для сортировки.
+ * @param comp Ссылка на счетчик сравнений.
+ * @param assign Ссылка на счетчик присваиваний.
  */
-void hoareSortExtraMemory(vector<int>& arr) {
+void hoareSortExtraMemory(vector<int>& arr, long long& comp, long long& assign) {
     if (arr.size() <= 1) {
         return;
     }
 
     int pivot = arr[arr.size() / 2];
-    assignments++;
+    assign++;
 
     vector<int> left;
     vector<int> right;
     vector<int> equals;
 
     for (size_t i = 0; i < arr.size(); i++) {
-        comparisons++;
+        comp++;
         if (arr[i] < pivot) {
             left.push_back(arr[i]);
-            assignments++;
+            assign++;
         }
         else {
-            comparisons++;
+            comp++;
             if (arr[i] > pivot) {
                 right.push_back(arr[i]);
-                assignments++;
+                assign++;
             }
             else {
                 equals.push_back(arr[i]);
-                assignments++;
+                assign++;
             }
         }
     }
 
-    hoareSortExtraMemory(left);
-    hoareSortExtraMemory(right);
+    hoareSortExtraMemory(left, comp, assign);
+    hoareSortExtraMemory(right, comp, assign);
 
-    int index = 0;
-    for (int x : left) {
-        arr[index++] = x;
-        assignments++;
+    size_t index = 0;
+    for (size_t i = 0; i < left.size(); ++i) {
+        arr[index++] = left[i];
+        assign++;
     }
-    for (int x : equals) {
-        arr[index++] = x;
-        assignments++;
+    for (size_t i = 0; i < equals.size(); ++i) {
+        arr[index++] = equals[i];
+        assign++;
     }
-    for (int x : right) {
-        arr[index++] = x;
-        assignments++;
+    for (size_t i = 0; i < right.size(); ++i) {
+        arr[index++] = right[i];
+        assign++;
     }
 }
 
 /**
  * @brief Генерирует массив заданного размера, заполненный случайными числами от -100 до 100.
- * @param size Количество элементов в генерируемом массиве.
- * @return Вектор (vector<int>), содержащий случайные числа.
+ * @param size Количество элементов в массиве.
+ * @return Вектор со случайными числами.
  */
-vector<int> generateRandomArray(int size) {
+vector<int> generateRandomArray(size_t size) {
     vector<int> arr(size);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; ++i) {
         arr[i] = rand() % 201 - 100;
     }
     return arr;
@@ -140,35 +133,35 @@ vector<int> generateRandomArray(int size) {
 
 int main() {
     setlocale(LC_ALL, "RUSSIAN");
-    srand(time(0));
-    int N = 10000;
+    srand(static_cast<unsigned int>(time(0)));
+    size_t N = 10000;
 
     cout << "Генерируем массив из " << N << " элементов..." << endl;
     vector<int> originalArray = generateRandomArray(N);
 
-    // Сортировка Выбором
+    // 1. Сортировка Выбором
     vector<int> arr1 = originalArray;
-    resetCounters();
-    selectionSort(arr1);
+    long long comp1 = 0, assign1 = 0;
+    selectionSort(arr1, comp1, assign1);
     cout << "\n1. Сортировка Выбором (в лоб):" << endl;
-    cout << "Сравнений: " << comparisons << endl;
-    cout << "Присваиваний: " << assignments << endl;
+    cout << "Сравнений: " << comp1 << endl;
+    cout << "Присваиваний: " << assign1 << endl;
 
-    // Сортировка Вставками
+    // 2. Сортировка Вставками
     vector<int> arr2 = originalArray;
-    resetCounters();
-    insertionSort(arr2);
-    cout << "\n2. Сортировка Вставками:" << endl;
-    cout << "Сравнений: " << comparisons << endl;
-    cout << "Присваиваний: " << assignments << endl;
+    long long comp2 = 0, assign2 = 0;
+    insertionSort(arr2, comp2, assign2);
+    cout << "\n2. Сортировка Вставками :" << endl;
+    cout << "Сравнений: " << comp2 << endl;
+    cout << "Присваиваний: " << assign2 << endl;
 
-    // Сортировка Хоара 
+    // 3. Сортировка Хоара
     vector<int> arr3 = originalArray;
-    resetCounters();
-    hoareSortExtraMemory(arr3);
-    cout << "\n3. Сортировка Хоара:" << endl;
-    cout << "Сравнений: " << comparisons << endl;
-    cout << "Присваиваний: " << assignments << endl;
+    long long comp3 = 0, assign3 = 0;
+    hoareSortExtraMemory(arr3, comp3, assign3);
+    cout << "\n3. Сортировка Хоара :" << endl;
+    cout << "Сравнений: " << comp3 << endl;
+    cout << "Присваиваний: " << assign3 << endl;
 
     return 0;
 }
