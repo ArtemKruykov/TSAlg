@@ -33,7 +33,7 @@ void selectionSort(vector<int>& arr, long long& comp, long long& assign) {
 }
 
 /**
- * @brief Сортирует массив методом вставок, используя std::vector::insert и std::vector::erase.
+ * @brief Сортирует массив методом вставок.
  * @param arr Вектор целых чисел для сортировки.
  * @param comp Ссылка на счетчик сравнений.
  * @param assign Ссылка на счетчик присваиваний.
@@ -43,15 +43,24 @@ void insertionSort(vector<int>& arr, long long& comp, long long& assign) {
     for (size_t i = 1; i < n; ++i) {
         int key = arr[i];
         assign++;
-        size_t j = 0;
 
-        while (j < i) {
+        size_t left = 0;
+        size_t right = i;
+
+        // Поиск места вставки методом половинного деления
+        while (left < right) {
+            size_t mid = left + (right - left) / 2;
             comp++;
-            if (arr[j] > key) {
-                break;
+
+            if (arr[mid] <= key) {
+                left = mid + 1;
             }
-            j++;
+            else {
+                right = mid;
+            }
         }
+
+        size_t j = left;
 
         if (j < i) {
             arr.erase(arr.begin() + i);
@@ -84,19 +93,18 @@ void hoareSortExtraMemory(vector<int>& arr, long long& comp, long long& assign) 
         comp++;
         if (arr[i] < pivot) {
             left.push_back(arr[i]);
-            assign++;
         }
         else {
             comp++;
             if (arr[i] > pivot) {
                 right.push_back(arr[i]);
-                assign++;
             }
             else {
                 equals.push_back(arr[i]);
-                assign++;
             }
         }
+
+        assign++;
     }
 
     hoareSortExtraMemory(left, comp, assign);
